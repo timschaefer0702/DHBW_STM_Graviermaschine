@@ -1,4 +1,8 @@
 # Eclipse
+!*.c
+!*.h
+!*.s
+
 .metadata
 .settings
 [Rr]elease

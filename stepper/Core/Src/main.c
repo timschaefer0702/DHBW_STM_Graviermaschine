@@ -162,21 +162,26 @@ void Stepper_test(){
 	result |= L6474_Initialize(h, &param);
 	result |= L6474_SetPowerOutputs(h, 1);
 
-	// in case we have no error, we can enable the drivers
-	// and then we step a bit
-	if ( result == 0 )
-	{
-	result |= L6474_StepIncremental(h, 1000 );
-	}
-	else
-	{
-	// error handling
 
-	}
 
 
 	// loop start
 	while(1){
+
+		// in case we have no error, we can enable the drivers
+			// and then we step a bit
+			if ( result == 0 )
+			{
+
+			result |= L6474_StepIncremental(h, 10 );
+
+			}
+			else
+			{
+			// error handling
+
+			}
+			vTaskDelay(pdMS_TO_TICKS( 10 ));
 
 	}
 
