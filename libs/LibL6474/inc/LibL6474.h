@@ -1030,5 +1030,5 @@ int L6474_SetAlarmEnables(L6474_Handle_t h, int bits);
  * -# now implement the platform functions which are required be the L6474x_Platform_t structure when calling L6474_CreateInstance.
  * -# when all functions are defined, no error should be returned after the call of L6474_CreateInstance. Porting is done.
  */
-
+ 
  #endif /* INC_LIBL6474_H_ */
