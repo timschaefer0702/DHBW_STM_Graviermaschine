@@ -47,6 +47,8 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart3;
 
+L6474_Handle_t hL6474;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -84,43 +86,7 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // --------------------------------------------------------------------------------------------------------------------
-static int CapabilityFunc( int argc, char** argv, void* ctx )
-// --------------------------------------------------------------------------------------------------------------------
-{
-	(void)argc;
-	(void)argv;
-	(void)ctx;
-	printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\nOK",
-	    0, // has spindle
-		0, // has spindle status
-		0, // has stepper
-		0, // has stepper move relative
-		0, // has stepper move speed
-		0, // has stepper move async
-		0, // has stepper status
-		0, // has stepper refrun
-		0, // has stepper refrun timeout
-		0, // has stepper refrun skip
-		0, // has stepper refrun stay enabled
-		0, // has stepper reset
-		0, // has stepper position
-		0, // has stepper config
-		0, // has stepper config torque
-		0, // has stepper config throvercurr
-		0, // has stepper config powerena
-		0, // has stepper config stepmode
-		0, // has stepper config timeoff
-		0, // has stepper config timeon
-		0, // has stepper config timefast
-		0, // has stepper config mmperturn
-		0, // has stepper config posmax
-		0, // has stepper config posmin
-		0, // has stepper config posref
-		0, // has stepper config stepsperturn
-		0  // has stepper cancel
-	);
-	return 0;
-}
+
 
 //static int ConsoleWriteStream_ToStdErr(void* pContext, const char* pBuffer, int num)
 //{
@@ -149,7 +115,7 @@ void Stepper_test(){
 	p.sleep = StepLibraryDelay;
 	p.step = StepTimer;
 	// now create the handle
-	L6474_Handle_t h = L6474_CreateInstance(&p, 0, 0, &htim2);
+	hL6474 = L6474_CreateInstance(&p, 0, 0, &htim2);
 
 
 	int result = 0;
@@ -158,9 +124,9 @@ void Stepper_test(){
 	result |= L6474_SetBaseParameter(&param);
 
 	// reset all and take all initialization steps
-	result |= L6474_ResetStandBy(h);
-	result |= L6474_Initialize(h, &param);
-	result |= L6474_SetPowerOutputs(h, 1);
+	result |= L6474_ResetStandBy(hL6474);
+	result |= L6474_Initialize(hL6474, &param);
+	result |= L6474_SetPowerOutputs(hL6474, 1);
 
 
 
@@ -173,7 +139,7 @@ void Stepper_test(){
 			if ( result == 0 )
 			{
 
-			result |= L6474_StepIncremental(h, 10 );
+			result |= L6474_StepIncremental(hL6474, 10 );
 
 			}
 			else
@@ -186,6 +152,18 @@ void Stepper_test(){
 	}
 
 
+}
+
+void Console_task ()
+{
+
+	Console_init();
+
+
+	while (1)
+	{
+
+	}
 }
 
 int main(void)
@@ -223,6 +201,7 @@ int main(void)
   printf("Hallo Welt\r\n");
   (void)CapabilityFunc;
   xTaskCreate(Stepper_test, "moin teschd", 4096, NULL, 5, NULL);
+  xTaskCreate( Console_task , "console_task" , 4096 , NULL , 5 , NULL );
   vTaskStartScheduler();
   /* USER CODE END 2 */
 
