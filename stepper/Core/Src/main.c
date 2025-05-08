@@ -47,6 +47,8 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart3;
 
+L6474_Handle_t hL6474;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -58,6 +60,7 @@ static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void L6474_create(void);
 /* USER CODE BEGIN PFP */
 extern void initialise_stdlib_abstraction( void );
 
@@ -141,15 +144,7 @@ void Stepper_test(){
 	// pass all function pointers required by the stepper library
 	// to a separate platform abstraction structure
 	printf("Stepper Task\r\n");
-	L6474x_Platform_t p;
-	p.malloc = StepLibraryMalloc;
-	p.free = StepLibraryFree;
-	p.transfer = StepDriverSpiTransfer;
-	p.reset = StepDriverReset;
-	p.sleep = StepLibraryDelay;
-	p.step = StepTimer;
-	// now create the handle
-	L6474_Handle_t h = L6474_CreateInstance(&p, 0, 0, &htim2);
+
 
 
 	int result = 0;
@@ -158,9 +153,9 @@ void Stepper_test(){
 	result |= L6474_SetBaseParameter(&param);
 
 	// reset all and take all initialization steps
-	result |= L6474_ResetStandBy(h);
-	result |= L6474_Initialize(h, &param);
-	result |= L6474_SetPowerOutputs(h, 1);
+	result |= L6474_ResetStandBy(hL6474);
+	result |= L6474_Initialize(hL6474, &param);
+	result |= L6474_SetPowerOutputs(hL6474, 1);
 
 
 
@@ -173,7 +168,7 @@ void Stepper_test(){
 			if ( result == 0 )
 			{
 
-			result |= L6474_StepIncremental(h, 10 );
+			result |= L6474_StepIncremental(hL6474, 10 );
 
 			}
 			else
@@ -220,6 +215,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  L6474_create();
   printf("Hallo Welt\r\n");
   (void)CapabilityFunc;
   xTaskCreate(Stepper_test, "moin teschd", 4096, NULL, 5, NULL);
@@ -531,6 +527,19 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
+static void L6474_create(){
+
+	L6474x_Platform_t p;
+	p.malloc = StepLibraryMalloc;
+	p.free = StepLibraryFree;
+	p.transfer = StepDriverSpiTransfer;
+	p.reset = StepDriverReset;
+	p.sleep = StepLibraryDelay;
+	p.step = StepTimer;
+	// now create the handle
+	hL6474 = L6474_CreateInstance(&p, 0, 0, &htim2);
+
+}
 /* USER CODE BEGIN 4 */
 void vAssertCalled( const char * const pcFileName, unsigned long ulLine )
 {
