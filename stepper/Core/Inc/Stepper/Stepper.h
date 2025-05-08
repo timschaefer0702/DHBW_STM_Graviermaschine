@@ -14,3 +14,5 @@ void StepLibraryDelay( int timems );
 int StepTimer( void* pPWM, int dir, unsigned int numPulses );
 
 int StepTimerCancelAsync( void* pPWM );
+
+int StepperReset();

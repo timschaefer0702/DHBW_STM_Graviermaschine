@@ -36,6 +36,8 @@ extern "C" {
 #include "stdio.h"
 #include "LibL6474.h"
 #include "Stepper.h"
+#include "Console.h"
+#include "Console_Implementation.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

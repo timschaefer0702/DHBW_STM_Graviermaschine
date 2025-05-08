@@ -1,6 +1,8 @@
 #include "Stepper.h"
 extern SPI_HandleTypeDef hspi1;
+extern L6474_Handle_t hL6474;
 
+// ------------------------ functions for L6474x_Platform_t -------------------------------------------------------------------------------------------------
 void* StepLibraryMalloc( unsigned int size ){
 
 	return malloc(size);
@@ -38,7 +40,7 @@ int StepDriverSpiTransfer( void* pIO, char* pRX, const char* pTX, unsigned int l
 
 void StepDriverReset( void* pGPO, const int ena ){
 
-	HAL_GPIO_WritePin(GPIOF, STEP_RSTN_Pin, !ena);
+	HAL_GPIO_WritePin(GPIOF, STEP_RSTN_Pin, !ena); // set/release reset Pin
 
 }
 
@@ -70,6 +72,23 @@ int StepTimerCancelAsync( void* pPWM ){
 
 	HAL_GPIO_WritePin(GPIOD, STEP_PULSE_Pin, GPIO_PIN_RESET);
 
+}
+
+
+// ------------------------------- general functions called by Console Commands ------------------------------------------------------------------------------
+
+int StepperReset(){
+
+	// to do referenzfahrt
+	int result = 0;
+
+	L6474_BaseParameter_t param;
+	result |= L6474_SetBaseParameter(&param);
+
+	// reset all and take all initialization steps
+	result |= L6474_ResetStandBy(hL6474);
+	result |= L6474_Initialize(hL6474, &param);
+	result |= L6474_SetPowerOutputs(hL6474, 1);
 }
 
 

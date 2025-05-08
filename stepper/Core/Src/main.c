@@ -41,7 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi1; // use globallay with extern
 
 TIM_HandleTypeDef htim2;
 
@@ -174,7 +174,7 @@ void Stepper_test(){
 			else
 			{
 			// error handling
-
+				printf("dominiklool");
 			}
 			vTaskDelay(pdMS_TO_TICKS( 10 ));
 
@@ -214,6 +214,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   MX_TIM2_Init();
+  Console_init();
   /* USER CODE BEGIN 2 */
   L6474_create();
   printf("Hallo Welt\r\n");
