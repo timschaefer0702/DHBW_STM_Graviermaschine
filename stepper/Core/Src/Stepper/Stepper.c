@@ -1,6 +1,7 @@
 #include "Stepper.h"
 extern SPI_HandleTypeDef hspi1;
 extern L6474_Handle_t hL6474;
+extern uint16_t stepper_referenced;
 
 // ------------------------ functions for L6474x_Platform_t -------------------------------------------------------------------------------------------------
 void* StepLibraryMalloc( unsigned int size ){
@@ -92,6 +93,8 @@ int StepperReset(){
 	// reset and reinitialize, do not setPowerOutput
 	result |= L6474_ResetStandBy(hL6474);
 	result |= L6474_Initialize(hL6474, &param);
+
+	stepper_referenced = 0;
 
 	return result;
 
