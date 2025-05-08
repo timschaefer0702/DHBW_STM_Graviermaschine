@@ -64,6 +64,8 @@ int StepTimer( void* pPWM, int dir, unsigned int numPulses ){
 
 	}
 
+	return 0;
+
 
 }
 
@@ -71,6 +73,8 @@ int StepTimer( void* pPWM, int dir, unsigned int numPulses ){
 int StepTimerCancelAsync( void* pPWM ){
 
 	HAL_GPIO_WritePin(GPIOD, STEP_PULSE_Pin, GPIO_PIN_RESET);
+
+	return 0;
 
 }
 
@@ -89,6 +93,8 @@ int StepperReset(){
 	result |= L6474_ResetStandBy(hL6474);
 	result |= L6474_Initialize(hL6474, &param);
 	result |= L6474_SetPowerOutputs(hL6474, 1);
+
+	return 0;
 }
 
 

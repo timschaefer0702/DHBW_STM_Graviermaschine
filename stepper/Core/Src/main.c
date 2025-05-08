@@ -168,7 +168,7 @@ void Stepper_test(){
 			if ( result == 0 )
 			{
 
-			result |= L6474_StepIncremental(hL6474, 10 );
+			result |= L6474_StepIncremental(hL6474, 1000 );
 
 			}
 			else
