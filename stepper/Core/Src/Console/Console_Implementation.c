@@ -15,8 +15,9 @@ uint32_t Console_init ()
 
 	CONSOLE_RegisterCommand(c, "capability", "prints a specified string of capability bits",
 								CapabilityFunc, NULL);
-	CONSOLE_RegisterCommand(c, "schmarn", "resets the stepper motor",
-								StepperReset_Func, NULL);
+	CONSOLE_RegisterCommand(c, "stepper", "<<stepper>> is used to control a stepper motor.\r\n",
+								StepperCommand_Func, NULL);
+
 }
 
 static int CapabilityFunc( int argc, char** argv, void* ctx )
@@ -57,15 +58,40 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 	return 0;
 }
 
-static int StepperReset_Func( int argc, char** argv, void* ctx )
+static int StepperCommand_Func( int argc, char** argv, void* ctx)
 {
-	if(argc < 0)
+	L6474_Handle_t h = (L6474_Handle_t)ctx;
+
+	if ( argc == 0 )
 	{
-		printf("Schmarn passiert");
+	printf("invalid number of arguments\r\nFAIL");
+	return -1;
 	}
-	//hier sauber stepper resetten
-	printf("kein Schmarn passiert");
-	L6474_ResetStandBy(hL6474);
+	if ( strcmp(argv[0], "reset") == 0 )
+	{
+		//TODO reset funktion einbinden
+	}
+	else if ( strcmp(argv[0], "move") == 0 )
+	{
+		if (argc < 2){
+			printf("missing further parameters");
+			return -1;
+		}
+		//TODO move funktion einbinden
+	}
+	else if ( strcmp(argv[0], "reference") == 0 )
+	{
+	//TODO referenzfahrt programmieren
+	}
+	else
+	{
+	printf("invalid subcommand was given as argument\r\nFAIL");
+	}
+
+
 	return 0;
 }
+
+
+
 
