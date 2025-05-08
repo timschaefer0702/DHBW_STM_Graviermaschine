@@ -67,12 +67,12 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 	printf("invalid number of arguments\r\nFAIL");
 	return -1;
 	}
+//-------------------------------------------------------------------------
 	if ( strcmp(argv[0], "reset") == 0 )
 	{
-
 		printFuncUnsuccess(StepperReset());
-
 	}
+//-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "move") == 0 )
 	{
 		if (argc < 2){
@@ -81,10 +81,35 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 		}
 		//TODO move funktion einbinden
 	}
+//-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "reference") == 0 )
 	{
 	//TODO referenzfahrt programmieren
+		if (argc == 1)
+		{
+			//TODO normale Referenzfahrt Poweroutputs danach aus machen
+		}
+		else if ((argc > 1)&& strcmp(argv[1],"-e")== 0)
+		{
+			//TODO Referenzfahrt mit poweroutputs anlassen
+		}
 	}
+//-------------------------------------------------------------------------
+	else if ( strcmp(argv[0], "config") == 0 )
+		{
+			if ( strcmp(argv[1], "powerena") == 0 )
+			{
+				if (argc == 2)
+				{
+					//TODO powerenable umschalten bzw. negieren -> wir müssen powerena status getten
+				}
+				else if (argc == 4 && strcmp(argv[2], "-v") == 0)
+				{
+					//TODO powerenable auf Wert in argv[3] setzen
+				}
+			}
+		}
+//-------------------------------------------------------------------------
 	else
 	{
 	printf("invalid subcommand was given as argument\r\nFAIL");
