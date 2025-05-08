@@ -83,18 +83,18 @@ int StepTimerCancelAsync( void* pPWM ){
 
 int StepperReset(){
 
-	// to do referenzfahrt
+	// TODO referenzfahrt
 	int result = 0;
 
 	L6474_BaseParameter_t param;
 	result |= L6474_SetBaseParameter(&param);
 
-	// reset all and take all initialization steps
+	// reset and reinitialize, do not setPowerOutput
 	result |= L6474_ResetStandBy(hL6474);
 	result |= L6474_Initialize(hL6474, &param);
-	result |= L6474_SetPowerOutputs(hL6474, 1);
 
-	return 0;
+	return result;
+
 }
 
 

@@ -69,7 +69,9 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 	}
 	if ( strcmp(argv[0], "reset") == 0 )
 	{
-		//TODO reset funktion einbinden
+
+		printFuncUnsuccess(StepperReset());
+
 	}
 	else if ( strcmp(argv[0], "move") == 0 )
 	{
@@ -90,6 +92,23 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 
 
 	return 0;
+}
+
+// prints OK when function was successfully called - return value 0, or prints FAIL if func was not sucessfully called -> return value !0
+static void printFuncUnsuccess(int unsuccess){
+
+	if( unsuccess ){
+
+			printf("\r\nFAIL");
+
+	}
+
+	else{
+
+		printf("\r\nOK");
+
+	}
+
 }
 
 

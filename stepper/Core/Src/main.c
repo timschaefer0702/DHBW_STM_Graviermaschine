@@ -49,6 +49,8 @@ UART_HandleTypeDef huart3;
 
 L6474_Handle_t hL6474;
 
+uint16_t stepper_referenced = 0; // 0 -> refernce fahrd isch needed
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -159,7 +161,7 @@ void Stepper_test(){
 
 
 
-
+	int count = 0;
 	// loop start
 	while(1){
 

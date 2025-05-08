@@ -7,6 +7,8 @@ static int CapabilityFunc( int argc, char** argv, void* ctx );
 
 static int StepperCommand_Func( int argc, char** argv, void* ctx );
 
+static void printFuncUnsuccess(int unsuccess);
+
 
 
 
