@@ -61,26 +61,53 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 static int StepperCommand_Func( int argc, char** argv, void* ctx)
 {
 	L6474_Handle_t h = (L6474_Handle_t)ctx;
-
+// kein subcommand
 	if ( argc == 0 )
 	{
 	printf("invalid number of arguments\r\nFAIL");
 	return -1;
 	}
+// stepper reset
 //-------------------------------------------------------------------------
 	if ( strcmp(argv[0], "reset") == 0 )
 	{
 		printFuncUnsuccess(StepperReset());
 	}
+// stepper move
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "move") == 0 )
 	{
-		if (argc < 2){
+		if (argc < 2)
+		{
 			printf("missing further parameters");
 			return -1;
 		}
+		else if (argc == 2)
+		{
+			//check nach argv[1] ist zahl
+			// moveAbs
+		}
+		else if (argc == 3)
+		{
+			if( strcmp(argv[2], "-r") == 0 )
+			{
+				//moveRel
+			}
+			if( strcmp(argv[2], "-a") == 0 )
+			{
+				//moveAbs
+			}
+		}
+		else if (argc == 4)
+		{
+			if( strcmp(argv[2], "-s") == 0 )
+			{
+				//moveAbs mit Speed
+			}
+		}
 		//TODO move funktion einbinden
 	}
+// stepper reference
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "reference") == 0 )
 	{
@@ -89,11 +116,44 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 		{
 			//TODO normale Referenzfahrt Poweroutputs danach aus machen
 		}
-		else if ((argc > 1)&& strcmp(argv[1],"-e")== 0)
+		else if (argc == 2)
 		{
-			//TODO Referenzfahrt mit poweroutputs anlassen
+			if( strcmp(argv[1], "-e") == 0 )
+			{
+				//TODO Referenzfahrt mit poweroutputs anlassen
+			}
+			if( strcmp(argv[1], "-s") == 0 )
+			{
+				//Referenzfahrt überspringen
+			}
+		}
+		else if (argc == 3)
+		{
+			if( strcmp(argv[1], "-t") == 0 )
+			{
+				//Referenzfahrt mit Timeout
+			}
 		}
 	}
+// stepper position
+//-------------------------------------------------------------------------
+	else if ( strcmp(argv[0], "position") == 0 )
+	{
+
+	}
+// stepper cancel
+//-------------------------------------------------------------------------
+	else if ( strcmp(argv[0], "position") == 0 )
+	{
+
+	}
+// stepper status
+//-------------------------------------------------------------------------
+	else if ( strcmp(argv[0], "status") == 0 )
+	{
+
+	}
+// stepper config
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "config") == 0 )
 		{
