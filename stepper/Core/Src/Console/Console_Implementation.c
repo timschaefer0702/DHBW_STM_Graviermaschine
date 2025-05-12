@@ -136,7 +136,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 		else if (argc == 3)
 		{
 			long time;
-			if( strcmp(argv[1], "-t") == 0 && && checkZahlenEingabeInt(argv[2],&time) == 0)
+			if( strcmp(argv[1], "-t") == 0 && checkZahlenEingabeInt(argv[2],&time) == 0)
 			{
 				//Referenzfahrt mit Timeout
 			}
