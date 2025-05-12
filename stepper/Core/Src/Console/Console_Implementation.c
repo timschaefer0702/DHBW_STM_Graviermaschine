@@ -150,7 +150,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 	}
 // stepper cancel
 //-------------------------------------------------------------------------
-	else if ( strcmp(argv[0], "position") == 0 )
+	else if ( strcmp(argv[0], "cancel") == 0 )
 	{
 
 	}
