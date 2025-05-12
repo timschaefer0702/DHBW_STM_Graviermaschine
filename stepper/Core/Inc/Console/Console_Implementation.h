@@ -9,6 +9,10 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx );
 
 static void printFuncUnsuccess(int unsuccess);
 
+int checkZahlenEingabeInt (char* arg, long* numberVal);
+
+int checkZahlenEingabeFloat (char* arg, double* numberVal);
+
 
 
 
