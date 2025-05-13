@@ -50,6 +50,12 @@ UART_HandleTypeDef huart3;
 L6474_Handle_t hL6474;
 
 uint16_t stepper_referenced = 0; // 0 -> refernce fahrd isch needed
+uint16_t spinlde_direction = 0;  // 0 -> clockwise
+								 // 1 -> counter-clockwise
+
+ConsoleHandle_t cH; //global use with extern in ConsoleImplementation.
+
+SpindleHandle_t hSpindle;
 
 /* USER CODE BEGIN PV */
 
@@ -149,6 +155,8 @@ void Stepper_test(){
 
 }
 
+
+
 int main(void)
 {
 
@@ -181,6 +189,8 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   Console_init();
+  //Spindle auf jeden Fall nach Console initen, da Spinlde Handle von Console braucht
+  SpindleInit();
   /* USER CODE BEGIN 2 */
   L6474_create();
   printf("Hallo Welt\r\n");

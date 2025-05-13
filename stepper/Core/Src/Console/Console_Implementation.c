@@ -8,14 +8,15 @@
 
 
 extern L6474_Handle_t hL6474;
+extern ConsoleHandle_t cH;
 
 uint32_t Console_init ()
 {
-	ConsoleHandle_t c = CONSOLE_CreateInstance( 4*configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 5 );
+	cH = CONSOLE_CreateInstance( 4*configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 5 );
 
-	CONSOLE_RegisterCommand(c, "capability", "prints a specified string of capability bits",
+	CONSOLE_RegisterCommand(cH, "capability", "prints a specified string of capability bits",
 								CapabilityFunc, NULL);
-	CONSOLE_RegisterCommand(c, "stepper", "<<stepper>> is used to control a stepper motor.\r\n",
+	CONSOLE_RegisterCommand(cH, "stepper", "<<stepper>> is used to control a stepper motor.\r\n",
 								StepperCommand_Func, NULL);
 
 }
