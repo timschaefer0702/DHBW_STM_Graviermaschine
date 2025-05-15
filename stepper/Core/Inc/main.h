@@ -113,6 +113,9 @@ void Stepper_test();
 #define SPINDLE_SI_L_Pin GPIO_PIN_0
 #define SPINDLE_SI_L_GPIO_Port GPIOE
 
+
+#define OK 0
+#define FAIL -1
 /* USER CODE BEGIN Private defines */
 enum Stepper_StatusCode_t
 // --------------------------------------------------------------------------------------------------------------------

@@ -2,9 +2,10 @@
 extern SPI_HandleTypeDef hspi1;
 extern L6474_Handle_t hL6474;
 extern enum Stepper_StatusCode_t stepper_state;
+extern long stepper_abs_pos;
 
 // ------------------------ functions for L6474x_Platform_t -------------------------------------------------------------------------------------------------
-void* StepLibraryMalloc( unsigned int size ){
+ void* StepLibraryMalloc( unsigned int size ){
 
 	return malloc(size);
 
@@ -84,8 +85,7 @@ int StepTimerCancelAsync( void* pPWM ){
 
 int StepperReset(){
 
-	// TODO referenzfahrt
-	int result = 0;
+	int result = OK;
 
 	L6474_BaseParameter_t param;
 	result |= L6474_SetBaseParameter(&param);
@@ -94,7 +94,178 @@ int StepperReset(){
 	result |= L6474_ResetStandBy(hL6474);
 	result |= L6474_Initialize(hL6474, &param);
 
-	stepper_state = scsRef;
+	if( result == OK ){
+
+		stepper_state = scsRef;
+
+	}
+
+	else{
+		stepper_state = scsInit;
+	}
+
+	return result;
+
+}
+
+/*
+ * 0 - no param
+ * 1 - -e (leaves power enabled)
+ * 2 - -s (skip ref drive)
+ * 3 - -t (with timeout) -> only here time_to_timeout used
+ */
+int StepperReference(int param, uint16_t time_to_timeout){
+
+	int result = OK;
+
+	if( stepper_state == scsRef ){
+
+			switch (param) {
+
+			 	case 0:
+
+			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+
+			 		if( result != OK ) return result; // das wird ja eh nix
+
+			 		// drive till contact
+			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
+
+			 	    result |= L6474_StepIncremental(hL6474, -1);
+
+			 		}
+
+			 		if( result == OK ){
+
+			 			stepper_state = scsDIS;
+			 			stepper_abs_pos = 0;
+
+			 		}
+
+			 		else{
+
+			 			stepper_state = scsInit;
+
+			 		}
+
+
+
+			 		result |= L6474_SetPowerOutputs(hL6474, 0);
+
+
+			 		break;
+
+			 	case 1:
+
+			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+
+			 		if( result != OK ) return result; // das wird ja eh nix
+
+			 		// drive till contact
+			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
+
+			 				result |= L6474_StepIncremental(hL6474, -1);
+
+			 		}
+
+			 		if( result == OK ){
+
+			 			stepper_state = scsENA;
+
+			 		}
+
+			 		else{
+
+			 			stepper_state = scsInit;
+
+			 		}
+
+			 		break;
+
+			 	case 2:
+
+			 		result = OK;
+			 		stepper_state = scsDIS;
+			 		// TODO macht sinn? lol? oder tatsächliche position irgendwoher nehmen?
+			 		stepper_abs_pos = 0;
+
+			 		break;
+
+			 	case 3:
+
+			 		// TODO overflow nicht beachtet
+			 		TickType_t currentTime = pdTICKS_TO_MS( xTaskGetTickCount() ); // current time in ms
+			 		TickType_t endTime = currentTime + time_to_timeout * 1000;
+
+			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+
+			 		if( result != OK ) return result; // das wird ja eh nix
+
+			 		// drive till contact
+			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
+
+			 				result |= L6474_StepIncremental(hL6474, -1);
+			 				currentTime = pdTICKS_TO_MS( xTaskGetTickCount() );
+
+			 				if ( currentTime > endTime ) {
+
+			 					L6474_SetPowerOutputs(hL6474, 0);
+			 					return FAIL;
+
+			 				}
+
+			 		}
+
+			 		if( result == OK ){
+
+			 			stepper_state = scsDIS;
+
+			 		}
+
+			 		else{
+
+			 			stepper_state = scsInit;
+
+			 		}
+
+			 		result |= L6474_SetPowerOutputs(hL6474, 0);
+
+			 		break;
+
+
+
+			}
+
+
+
+
+
+
+
+	}
+
+	else{
+
+		result = FAIL;
+
+	}
+
+
+	return result;
+
+}
+
+int StepperMove(int abs){
+	// TODO LED blinken
+	int result = OK;
+
+	// TODO check for borders
+
+	if( abs ){
+
+		return FAIL;
+
+	}
 
 	return result;
 

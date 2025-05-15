@@ -121,17 +121,17 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 	//TODO referenzfahrt programmieren
 		if (argc == 1)
 		{
-			//TODO normale Referenzfahrt Poweroutputs danach aus machen
+			printFuncUnsuccess( StepperReference(0, 0) );
 		}
 		else if (argc == 2)
 		{
 			if( strcmp(argv[1], "-e") == 0 )
 			{
-				//TODO Referenzfahrt mit poweroutputs anlassen
+				printFuncUnsuccess( StepperReference(1, 0) );
 			}
 			if( strcmp(argv[1], "-s") == 0 )
 			{
-				//Referenzfahrt überspringen
+				printFuncUnsuccess( StepperReference(2, 0) );
 			}
 		}
 		else if (argc == 3)
@@ -139,7 +139,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 			long time;
 			if( strcmp(argv[1], "-t") == 0 && checkZahlenEingabeInt(argv[2],&time) == 0)
 			{
-				//Referenzfahrt mit Timeout
+				printFuncUnsuccess( StepperReference(3, (uint16_t) time) );
 			}
 		}
 	}

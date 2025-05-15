@@ -56,6 +56,8 @@ uint16_t stepper_referenced = 0; // 0 -> refernce fahrd isch needed
 uint16_t spindle_direction = 0;  // 0 -> clockwise
 								 // 1 -> counter-clockwise
 
+long stepper_abs_pos = 0;
+
 ConsoleHandle_t cH; //global use with extern in ConsoleImplementation.
 
 SpindleHandle_t hSpindle;
@@ -136,21 +138,22 @@ void Stepper_test(){
 
 	int count = 0;
 	// loop start
-	while(1){
 
+	while(1){
+		/*
 		// in case we have no error, we can enable the drivers
 			// and then we step a bit
 			if ( result == 0 )
 			{
 
 			result |= L6474_StepIncremental(hL6474, 1000 );
-
+			printf("dominiklool");
 			}
 			else
 			{
 			// error handling
-				printf("dominiklool");
-			}
+				//printf("dominiklool");
+			}*/
 			vTaskDelay(pdMS_TO_TICKS( 10 ));
 
 	}
@@ -198,7 +201,7 @@ int main(void)
   L6474_create();
   printf("Hallo Welt\r\n");
   (void)CapabilityFunc;
-  xTaskCreate(Stepper_test, "moin teschd", 4096, NULL, 5, NULL);
+  //xTaskCreate(Stepper_test, "moin teschd", 4096, NULL, 5, NULL);
   vTaskStartScheduler();
   /* USER CODE END 2 */
 
