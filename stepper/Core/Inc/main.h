@@ -34,10 +34,13 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "task.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "LibL6474.h"
 #include "Stepper.h"
 #include "Console.h"
 #include "Console_Implementation.h"
+#include "string.h"
+#include "Spindle.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
