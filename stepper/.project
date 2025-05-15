@@ -281,11 +281,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/libs/LibL6474/inc/LibL6474.h</locationURI>
 		</link>
 		<link>
-			<name>Core/Src/Console/Console.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/libs/LibRTOSConsole/src/Console.c</locationURI>
-		</link>
-		<link>
 			<name>Core/Src/Spindle/Spindle.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/libs/LibSpindle/src/Spindle.c</locationURI>

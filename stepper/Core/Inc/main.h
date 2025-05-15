@@ -111,7 +111,20 @@ void Stepper_test();
 #define SPINDLE_SI_L_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
+enum Stepper_StatusCode_t
+// --------------------------------------------------------------------------------------------------------------------
+{
+	/*!
+	 *
+	 */
+	scsInit         =  0,
+	scsRef,
+	scsDIS,
+	scsENA,
+	scsFLT
 
+
+};
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

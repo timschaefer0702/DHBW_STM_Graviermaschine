@@ -49,7 +49,7 @@ UART_HandleTypeDef huart3;
 
 L6474_Handle_t hL6474;
 
-uint16_t stepper_referenced = 0; // 0 -> refernce fahrd isch needed
+enum Stepper_StatusCode_t stepper_state = scsInit;
 
 /* USER CODE BEGIN PV */
 
