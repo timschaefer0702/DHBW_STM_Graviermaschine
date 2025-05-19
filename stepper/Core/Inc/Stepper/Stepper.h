@@ -20,3 +20,7 @@ int StepperReset();
 int StepperReference(int param, uint16_t time_to_timeout);
 
 int StepperMove(int abs);
+
+int StepperStatus();
+
+int StepperPoweroutputs( int minusV, int value);

@@ -6,18 +6,20 @@
  */
 #include "Console_Implementation.h"
 
+#define PRINT_RESULT(res) ((res) != 0 ? printf("\r\nFAIL") : printf("\r\nOK"))
 
-extern L6474_Handle_t hL6474;
 extern ConsoleHandle_t cH;
+
+extern stepper_context schmarn_context;
 
 uint32_t Console_init ()
 {
 	cH = CONSOLE_CreateInstance( 4*configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 5 );
 
 	CONSOLE_RegisterCommand(cH, "capability", "prints a specified string of capability bits",
-								CapabilityFunc, NULL);
+							CapabilityFunc, NULL);
 	CONSOLE_RegisterCommand(cH, "stepper", "<<stepper>> is used to control a stepper motor.\r\n",
-								StepperCommand_Func, NULL);
+							StepperCommand_Func, NULL);
 
 }
 
@@ -34,26 +36,26 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 		0, // has stepper move relative
 		0, // has stepper move speed
 		0, // has stepper move async
-		0, // has stepper status
-		0, // has stepper refrun
-		0, // has stepper refrun timeout
-		0, // has stepper refrun skip
-		0, // has stepper refrun stay enabled
-		0, // has stepper reset
+		1, // has stepper status
+		1, // has stepper refrun
+		1, // has stepper refrun timeout
+		1, // has stepper refrun skip
+		1, // has stepper refrun stay enabled
+		1, // has stepper reset
 		0, // has stepper position
-		0, // has stepper config
-		0, // has stepper config torque
-		0, // has stepper config throvercurr
-		0, // has stepper config powerena
-		0, // has stepper config stepmode
-		0, // has stepper config timeoff
-		0, // has stepper config timeon
-		0, // has stepper config timefast
-		0, // has stepper config mmperturn
+		1, // has stepper config
+		1, // has stepper config torque
+		1, // has stepper config throvercurr
+		1, // has stepper config powerena
+		1, // has stepper config stepmode
+		1, // has stepper config timeoff
+		1, // has stepper config timeon
+		1, // has stepper config timefast
+		1, // has stepper config mmperturn
 		0, // has stepper config posmax
 		0, // has stepper config posmin
 		0, // has stepper config posref
-		0, // has stepper config stepsperturn
+		1, // has stepper config stepsperturn
 		0  // has stepper cancel
 	);
 	return 0;
@@ -159,23 +161,87 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "status") == 0 )
 	{
-
+		printFuncUnsuccess(StepperStatus());
 	}
 // stepper config
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "config") == 0 )
 		{
+		int result;
 			if ( strcmp(argv[1], "powerena") == 0 )
 			{
 				long powerena;
 				if (argc == 2)
 				{
-					//TODO powerenable umschalten bzw. negieren -> wir müssen powerena status getten
+					printFuncUnsuccess(StepperPoweroutputs(0,0));
 				}
 				else if (argc == 4 && strcmp(argv[2], "-v") == 0 && checkZahlenEingabeInt(argv[3],&powerena) == 0)
 				{
-					//TODO powerenable auf Wert in argv[3] setzen
+					printFuncUnsuccess(StepperPoweroutputs(1,powerena));
 				}
+			}
+			else if(argc == 2)
+			{
+				int value_to_read = 0;
+
+
+				if ( strcmp(argv[1], "torque") == 0 )
+				{
+					result = L6474_GetProperty(h, L6474_PROP_TORQUE, &value_to_read);
+					printf("%d\r\n", value_to_read);
+					PRINT_RESULT(result);
+				}
+				if ( strcmp(argv[1], "throvercurr") == 0 )
+				{
+					result = L6474_GetProperty(h, L6474_PROP_OCDTH, &value_to_read);
+					printf("%d\r\n", value_to_read);
+					PRINT_RESULT(result);
+
+				}
+				if ( strcmp(argv[1], "stepmode") == 0 )
+				{
+					printf("%d\r\n", schmarn_context.stepper_resolution);
+				}
+				if ( strcmp(argv[1], "stepsperturn") == 0 )
+				{
+					printf("%d\r\n", schmarn_context.stepper_stepsPturn);
+				}
+				if ( strcmp(argv[1], "timeoff") == 0 )
+				{
+					result = L6474_GetProperty(h, L6474_PROP_TOFF, &value_to_read);
+					printf("%d\r\n", value_to_read);
+					PRINT_RESULT(result);
+
+				}
+				if ( strcmp(argv[1], "timeon") == 0 )
+				{
+					result = L6474_GetProperty(h, L6474_PROP_TON, &value_to_read);
+					printf("%d\r\n", value_to_read);
+					PRINT_RESULT(result);
+				}
+				if ( strcmp(argv[1], "timefast") == 0 )
+				{
+					result = L6474_GetProperty(h, L6474_PROP_TFAST, &value_to_read);
+					printf("%d\r\n", value_to_read);
+					PRINT_RESULT(result);
+				}
+				if ( strcmp(argv[1], "mmperturn") == 0 )
+				{
+					printf("%f\r\n", schmarn_context.stepper_mmPturn);
+				}
+				if ( strcmp(argv[1], "posmax") == 0 )
+				{
+
+				}
+				if ( strcmp(argv[1], "posmin") == 0 )
+				{
+
+				}
+				if ( strcmp(argv[1], "posref") == 0 )
+				{
+
+				}
+
 			}
 			else if (argc == 4)
 			{
@@ -187,33 +253,67 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 					// not blocked by active states commands
 					if ( strcmp(argv[1], "torque") == 0 )
 					{
-
+						result = L6474_SetProperty(h, L6474_PROP_TORQUE, integerValue);
+						PRINT_RESULT(result);
 					}
 					if ( strcmp(argv[1], "throvercurr") == 0 )
 					{
-
+						result = L6474_SetProperty(h, L6474_PROP_OCDTH, integerValue);
+						PRINT_RESULT(result);
 					}
 					if ( strcmp(argv[1], "stepmode") == 0 )
 					{
+						L6474x_StepMode_t sm;
+						switch (integerValue)
+						{
+						case 1:
+							sm = smFULL;
+							break;
+						case 2:
+							sm = smHALF;
+							break;
+						case 4:
+							sm = smMICRO4;
+							break;
+						case 8:
+							sm = smMICRO8;
+							break;
+						case 16:
+							sm = smMICRO16;
+							break;
+						default:
+							printf("Invalid step mode\r\n");
+							return -1;
+						}
+						schmarn_context.stepper_resolution = integerValue;
+						result = L6474_SetStepMode(schmarn_context.hL6474, sm);
+						PRINT_RESULT(result);
 
 					}
 					if ( strcmp(argv[1], "stepsperturn") == 0 )
 					{
-
+						schmarn_context.stepper_stepsPturn = integerValue;
 					}
-					//BLOCKED BY ACTIVE STATE CONFIG COMMANDS TODO
-					if ( strcmp(argv[1], "timeoff") == 0 )
+					if(schmarn_context.stepper_state < scsENA)
 					{
-
+						//BLOCKED BY ACTIVE STATE CONFIG COMMANDS
+						if ( strcmp(argv[1], "timeoff") == 0 )
+						{
+							result = L6474_SetProperty(h, L6474_PROP_TOFF, integerValue);
+							PRINT_RESULT(result);
+						}
+						if ( strcmp(argv[1], "timeon") == 0 )
+						{
+							result = L6474_SetProperty(h, L6474_PROP_TON, integerValue);
+							PRINT_RESULT(result);
+						}
+						if ( strcmp(argv[1], "timefast") == 0 )
+						{
+							result = L6474_SetProperty(h, L6474_PROP_TFAST, integerValue);
+							PRINT_RESULT(result);
+						}
 					}
-					if ( strcmp(argv[1], "timeon") == 0 )
-					{
 
-					}
-					if ( strcmp(argv[1], "timefast") == 0 )
-					{
-
-					}
 				}
 				double doubleValue;
 				if(strcmp(argv[2], "-v") == 0 && checkZahlenEingabeFloat(argv[3],&doubleValue))
@@ -221,7 +321,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 				// requires floating points in command line commands
 					if ( strcmp(argv[1], "mmperturn") == 0 )
 					{
-
+						schmarn_context.stepper_mmPturn = doubleValue;
 					}
 					if ( strcmp(argv[1], "posmax") == 0 )
 					{

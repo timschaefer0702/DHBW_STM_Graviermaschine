@@ -41,6 +41,7 @@ extern "C" {
 #include "Console_Implementation.h"
 #include "string.h"
 #include "Spindle.h"
+#include "Spindle_Implementation.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -123,14 +124,25 @@ enum Stepper_StatusCode_t
 	/*!
 	 *
 	 */
-	scsInit         =  0,
-	scsRef,
-	scsDIS,
-	scsENA,
-	scsFLT
+	scsInit         = 0,
+	scsRef			= 1,
+	scsDIS			= 1<<1,
+	scsENA			= 1<<2,
+	scsFLT			= 1<<3
 
 
 };
+
+typedef struct
+{
+long stepper_abs_pos;
+int stepper_resolution;
+L6474_Handle_t hL6474;
+enum Stepper_StatusCode_t stepper_state;
+int stepper_stepsPturn;
+float stepper_mmPturn;
+
+}stepper_context;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

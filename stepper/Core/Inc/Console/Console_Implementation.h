@@ -1,5 +1,6 @@
 #include "main.h"
 #include "Stepper.h"
+#include "Console.h"
 
 uint32_t Console_init ();
 
