@@ -8,6 +8,7 @@
 
 
 
+
 void SpindleInit(TIM_HandleTypeDef timer_pwm);
 void SPINDLE_SetDirection (SpindleHandle_t h, void* context, int backward);
 void SPINDLE_SetDutyCycle (SpindleHandle_t h, void* context, float dutyCycle);

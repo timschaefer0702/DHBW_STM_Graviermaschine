@@ -9,7 +9,7 @@ int StepDriverSpiTransfer( void* pIO, char* pRX, const char* pTX, unsigned int l
 
 void StepDriverReset(void* pGPO, const int ena);
 
-void StepLibraryDelay( int timems );
+void StepLibraryDelay( unsigned int timems );
 
 int StepTimer( void* pPWM, int dir, unsigned int numPulses );
 
@@ -19,7 +19,7 @@ int StepperReset();
 
 int StepperReference(int param, uint16_t time_to_timeout);
 
-int StepperMove(int abs);
+int StepperMove(int movement, int param);
 
 int StepperStatus();
 

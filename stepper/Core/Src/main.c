@@ -370,6 +370,8 @@ static void MX_TIM2_Init(void)
 
 
 
+
+
 /**
   * @brief USART3 Initialization Function
   * @param None
@@ -530,9 +532,12 @@ static void L6474_create(){
 	schmarn_context.hL6474 = hL6474;
 	schmarn_context.stepper_state = scsInit;
 	schmarn_context.stepper_abs_pos = 0;
-	schmarn_context.stepper_resolution = 0;
-	schmarn_context.stepper_stepsPturn = 0;
-	schmarn_context.stepper_mmPturn = 0.0;
+	schmarn_context.stepper_stepsPturn = STEPS_IN_UMDREHUNG;
+	schmarn_context.stepper_mmPturn = MM_IN_UMDREHUNG;
+	schmarn_context.stepper_resolution = AUFLOESUNG;
+	schmarn_context.stepper_minSteps = 0;
+	schmarn_context.stepper_maxSteps = 100000;
+	schmarn_context.stepper_refSteps = 0;
 
 
 }

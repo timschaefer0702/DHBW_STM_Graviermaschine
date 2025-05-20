@@ -19,7 +19,7 @@ uint32_t Console_init ()
 	CONSOLE_RegisterCommand(cH, "capability", "prints a specified string of capability bits",
 							CapabilityFunc, NULL);
 	CONSOLE_RegisterCommand(cH, "stepper", "<<stepper>> is used to control a stepper motor.\r\n",
-							StepperCommand_Func, NULL);
+							StepperCommand_Func, &schmarn_context);
 
 }
 
@@ -32,8 +32,8 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 	printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\nOK",
 	    0, // has spindle
 		0, // has spindle status
-		0, // has stepper
-		0, // has stepper move relative
+		1, // has stepper
+		1, // has stepper move relative
 		0, // has stepper move speed
 		0, // has stepper move async
 		1, // has stepper status
@@ -42,7 +42,7 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 		1, // has stepper refrun skip
 		1, // has stepper refrun stay enabled
 		1, // has stepper reset
-		0, // has stepper position
+		1, // has stepper position
 		1, // has stepper config
 		1, // has stepper config torque
 		1, // has stepper config throvercurr
@@ -91,18 +91,18 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 		{
 			if(checkZahlenEingabeInt(argv[1],&movement) == 0 )
 			{
-
+				printFuncUnsuccess(StepperMove(movement,0));
 			}
 		}
 		else if (argc == 3)
 		{
 			if( strcmp(argv[2], "-r") == 0 && checkZahlenEingabeInt(argv[1],&movement) == 0 )
 			{
-				//moveRel
+				printFuncUnsuccess(StepperMove(movement,1));
 			}
 			if( strcmp(argv[2], "-a") == 0 && checkZahlenEingabeInt(argv[1],&movement) == 0 )
 			{
-				//moveAbs
+				//moveAbs async
 			}
 		}
 		else if (argc == 4)
@@ -149,13 +149,18 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "position") == 0 )
 	{
+		int position = -1;
+		int result = L6474_GetAbsolutePosition(schmarn_context.hL6474, &position);
+		printf("%d\r\n", position);
+		PRINT_RESULT(result);
 
 	}
 // stepper cancel
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "cancel") == 0 )
 	{
-
+		int result = StepTimerCancelAsync(NULL);
+		PRINT_RESULT(result);
 	}
 // stepper status
 //-------------------------------------------------------------------------
@@ -231,15 +236,19 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 				}
 				if ( strcmp(argv[1], "posmax") == 0 )
 				{
+					printf("%f\r\n", (float)(schmarn_context.stepper_maxSteps * schmarn_context.stepper_mmPturn)
+									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 
 				}
 				if ( strcmp(argv[1], "posmin") == 0 )
 				{
-
+					printf("%f\r\n", (float)(schmarn_context.stepper_minSteps * schmarn_context.stepper_mmPturn)
+									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 				}
 				if ( strcmp(argv[1], "posref") == 0 )
 				{
-
+					printf("%f\r\n", (float)(schmarn_context.stepper_refSteps * schmarn_context.stepper_mmPturn)
+									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 				}
 
 			}
@@ -325,15 +334,18 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 					}
 					if ( strcmp(argv[1], "posmax") == 0 )
 					{
-
+						schmarn_context.stepper_maxSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
+															/ schmarn_context.stepper_mmPturn;
 					}
 					if ( strcmp(argv[1], "posmin") == 0 )
 					{
-
+						schmarn_context.stepper_minSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
+																					/ schmarn_context.stepper_mmPturn;
 					}
 					if ( strcmp(argv[1], "posref") == 0 )
 					{
-
+						schmarn_context.stepper_refSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
+																											/ schmarn_context.stepper_mmPturn;
 					}
 				}
 			}

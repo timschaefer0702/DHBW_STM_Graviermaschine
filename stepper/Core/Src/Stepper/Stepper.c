@@ -52,7 +52,7 @@ void StepDriverReset( void* pGPO, const int ena ){
 }
 
 
-void StepLibraryDelay( int timems ){
+void StepLibraryDelay( unsigned int timems ){
 	vTaskDelay(pdMS_TO_TICKS( timems));
 }
 
@@ -144,6 +144,8 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 			schmarn_context.stepper_state = scsDIS;
 			 			schmarn_context.stepper_abs_pos = 0;
+			 			result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
+
 
 			 		}
 
@@ -184,6 +186,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 			schmarn_context.stepper_state = scsInit;
 
 			 		}
+			 		result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
 
 			 		break;
 
@@ -191,6 +194,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 		result = OK;
 			 		schmarn_context.stepper_state = scsDIS;
+			 		result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
 			 		// TODO macht sinn? lol? oder tatsächliche position irgendwoher nehmen?
 			 		schmarn_context.stepper_abs_pos = 0;
 
@@ -236,31 +240,24 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 0);
 
 			 		break;
-
-
-
 			}
-
-
-
-
-
-
-
 	}
 
 	else{
 
 		result = FAIL;
-
 	}
-
-
+	result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
 	return result;
-
 }
 
-int StepperMove(int abs){
+//param:
+//		0 - move abs
+//		1 - move rel
+//		2 - speed
+
+
+int StepperMove(int movement, int param){
 	// TODO LED blinken
 	int result = OK;
 
@@ -268,12 +265,52 @@ int StepperMove(int abs){
 	{
 		return FAIL;
 	}
+	int jetzige_pos;
+	int ziel;
+	result |= L6474_GetAbsolutePosition(schmarn_context.hL6474, &jetzige_pos);
 
-	if( abs ){
+	switch (param)
+	{
 
-		return FAIL;
+	case 0:
+		 ziel = (movement * schmarn_context.stepper_stepsPturn * schmarn_context.stepper_resolution)
+					/(60 * schmarn_context.stepper_mmPturn);
 
+
+
+			ziel = ziel - jetzige_pos;
+
+			if (ziel > schmarn_context.stepper_maxSteps || ziel < schmarn_context.stepper_minSteps )
+			{
+				printf("no valid step goal");
+				return -1;
+			}
+
+			result |= L6474_StepIncremental(schmarn_context.hL6474, ziel);
+			break;
+
+	case 1:
+		 ziel = (movement * schmarn_context.stepper_stepsPturn * schmarn_context.stepper_resolution)
+					/(60 * schmarn_context.stepper_mmPturn);
+
+		if (ziel + jetzige_pos > schmarn_context.stepper_maxSteps || ziel + jetzige_pos < schmarn_context.stepper_minSteps )
+					{
+						printf("no valid step goal");
+						return -1;
+					}
+		result |= L6474_StepIncremental(schmarn_context.hL6474, ziel);
+
+			break;
+
+	case 2:
+
+			break;
+
+
+	default:
+		return -1;
 	}
+
 
 	return result;
 
@@ -289,7 +326,7 @@ int StepperStatus()
 	driver_status = (dS.DIR)|(dS.HIGHZ<<1)|(dS.NOTPERF_CMD<<2)|(dS.OCD<<3)|(dS.ONGOING<<4)
 					|(dS.TH_SD<<5)|(dS.TH_WARN<<6)|(dS.UVLO<<7)|(dS.WRONG_CMD<<8);
 
-	printf("0x%x\r\n0x%x\r\n", schmarn_context.stepper_state, driver_status);
+	printf("0x%x\r\n0x%x\r\n", schmarn_context.stepper_state, ( unsigned int )driver_status);
 	//TODO is running einfügen
 	return result;
 }
