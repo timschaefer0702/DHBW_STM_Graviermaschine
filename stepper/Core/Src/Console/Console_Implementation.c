@@ -203,8 +203,11 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 				}
 				if ( strcmp(argv[1], "stepmode") == 0 )
 				{
-					printf("OK\r\n");
-					printf("%d\r\n", schmarn_context.stepper_resolution);
+					int stepmode;
+					printFuncUnsuccess(L6474_GetStepMode(h, &stepmode));
+					printf("%d\r\n", stepmode);
+
+
 				}
 				if ( strcmp(argv[1], "stepsperturn") == 0 )
 				{
@@ -252,6 +255,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 				}
 
+
 			}
 			else if (argc == 4)
 			{
@@ -274,19 +278,19 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 						L6474x_StepMode_t sm;
 						switch (integerValue)
 						{
-						case 1:
+						case 0:
 							sm = smFULL;
 							break;
-						case 2:
+						case 1:
 							sm = smHALF;
 							break;
-						case 4:
+						case 2:
 							sm = smMICRO4;
 							break;
-						case 8:
+						case 3:
 							sm = smMICRO8;
 							break;
-						case 16:
+						case 4:
 							sm = smMICRO16;
 							break;
 						default:
@@ -329,26 +333,32 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 						printf("OK\r\n");
 						schmarn_context.stepper_mmPturn = doubleValue;
 					}
-					if ( strcmp(argv[1], "posmax") == 0 )
+					else if ( strcmp(argv[1], "posmax") == 0 )
 					{
 						printf("OK\r\n");
 						schmarn_context.stepper_maxSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 															/ schmarn_context.stepper_mmPturn;
 					}
-					if ( strcmp(argv[1], "posmin") == 0 )
+					else if ( strcmp(argv[1], "posmin") == 0 )
 					{
 						printf("OK\r\n");
 						schmarn_context.stepper_minSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 																					/ schmarn_context.stepper_mmPturn;
 					}
-					if ( strcmp(argv[1], "posref") == 0 )
+					else if ( strcmp(argv[1], "posref") == 0 )
 					{
 						printf("OK\r\n");
 						schmarn_context.stepper_refSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 																											/ schmarn_context.stepper_mmPturn;
 					}
+					else
+					{
+						printf("invalid parameters\r\nFAIL");
+					}
 				}
+
 			}
+
 
 		}
 //-------------------------------------------------------------------------

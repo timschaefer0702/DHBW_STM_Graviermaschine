@@ -148,7 +148,8 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
-			 	    result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
+			 			schmarn_context.stepper_state = scsENA;
+			 			result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 
 			 		}
 
@@ -183,6 +184,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
+			 				schmarn_context.stepper_state = scsENA;
 			 				result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 
 			 		}
@@ -231,11 +233,13 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
+			 				schmarn_context.stepper_state = scsENA;
 			 				result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 			 				currentTime = pdTICKS_TO_MS( xTaskGetTickCount() );
 
 			 				if ( currentTime > endTime ) {
 
+			 					schmarn_context.stepper_state = scsRef;
 			 					L6474_SetPowerOutputs(schmarn_context.hL6474, 0);
 			 					return FAIL;
 

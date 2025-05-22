@@ -164,7 +164,60 @@ void Stepper_test(){
 
 }
 
+void LED_task()
+{
 
+	while(1){
+
+		switch (schmarn_context.stepper_state)
+		{
+		case scsInit:
+
+			HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_RED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
+
+			break;
+
+		case scsRef:
+
+			HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_RED_Pin | LED_BLUE_Pin, GPIO_PIN_RESET);
+
+			break;
+
+		case scsDIS:
+
+			HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_RED_Pin | LED_BLUE_Pin, GPIO_PIN_RESET);
+
+			break;
+
+		case scsENA:
+
+			int led;
+			led = ( HAL_GPIO_ReadPin(GPIOB, LED_BLUE_Pin) ) ? 0 : 1;
+			HAL_GPIO_WritePin(GPIOB, LED_BLUE_Pin, led);
+			HAL_GPIO_WritePin(GPIOB, LED_RED_Pin | LED_GREEN_Pin, GPIO_PIN_RESET);
+
+			break;
+
+		case scsFLT:
+
+			HAL_GPIO_WritePin(GPIOB, LED_RED_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin | LED_BLUE_Pin, GPIO_PIN_RESET);
+
+			break;
+
+		default:
+			printf("Dominiklok\r\n");
+			break;
+
+		}
+
+		vTaskDelay(pdMS_TO_TICKS( 1000 ));
+	}
+
+}
 
 int main(void)
 {
@@ -204,7 +257,7 @@ int main(void)
   L6474_create();
   printf("Hallo Welt\r\n");
   (void)CapabilityFunc;
-  //xTaskCreate(Stepper_test, "moin teschd", 4096, NULL, 5, NULL);
+  xTaskCreate(LED_task, "moin teschd", 4096, NULL, 5, NULL);
   vTaskStartScheduler();
   /* USER CODE END 2 */
 
