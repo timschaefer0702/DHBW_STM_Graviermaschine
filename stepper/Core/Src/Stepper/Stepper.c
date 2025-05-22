@@ -90,26 +90,38 @@ int StepTimerCancelAsync( void* pPWM ){
 
 int StepperReset(){
 
-	int result = OK;
+	if( schmarn_context.stepper_state == scsInit || schmarn_context.stepper_state == scsFLT ){
 
-	L6474_BaseParameter_t param;
-	result |= L6474_SetBaseParameter(&param);
+		int result = OK;
 
-	// reset and reinitialize, do not setPowerOutput
-	result |= L6474_ResetStandBy(schmarn_context.hL6474);
-	result |= L6474_Initialize(schmarn_context.hL6474, &param);
+			L6474_BaseParameter_t param;
+			result |= L6474_SetBaseParameter(&param);
 
-	if( result == OK ){
+			// reset and reinitialize, do not setPowerOutput
+			result |= L6474_ResetStandBy(schmarn_context.hL6474);
+			result |= L6474_Initialize(schmarn_context.hL6474, &param);
 
-		schmarn_context.stepper_state = scsRef;
+			if( result == OK ){
+
+				schmarn_context.stepper_state = scsRef;
+
+			}
+
+			else{
+
+				schmarn_context.stepper_state = scsFLT;
+
+			}
+
+			return result;
 
 	}
 
 	else{
-		schmarn_context.stepper_state = scsInit;
+		printf("invalid state\r\n");
+		return FAIL;
 	}
 
-	return result;
 
 }
 
@@ -151,7 +163,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 		else{
 
-			 			schmarn_context.stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsFLT;
 
 			 		}
 
@@ -183,7 +195,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 		else{
 
-			 			schmarn_context.stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsFLT;
 
 			 		}
 			 		result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
@@ -239,7 +251,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 		else{
 
-			 			schmarn_context.stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsFLT;
 
 			 		}
 
@@ -314,9 +326,13 @@ int StepperMove(int movement, int param){
 
 
 	default:
+
 		return -1;
+
 	}
 
+
+	if( result ) schmarn_context.stepper_state = scsFLT;
 
 	return result;
 
@@ -336,25 +352,37 @@ int StepperStatus()
 
 	printf("0\r\n"); //running einfügen
 
+	if( result ) schmarn_context.stepper_state = scsFLT;
 
 	return result;
 }
 
 int StepperPoweroutputs(int minusV, int value)
 {
-	int result = 0;
-	if (!minusV)
-	{
-		int onoff = (schmarn_context.stepper_state == scsDIS) ? 0 : 1 ;
-		printf("Powerenable: %d\r\n",onoff);
+	if( schmarn_context.stepper_state == scsENA || schmarn_context.stepper_state == scsDIS ){
+
+		int result = 0;
+			if (!minusV)
+			{
+				int onoff = (schmarn_context.stepper_state == scsDIS) ? 1 : 0 ;
+				printf("Powerenable: %d\r\n",onoff);
+
+			}
+			else
+			{
+				result |= L6474_SetPowerOutputs(schmarn_context.hL6474, value);
+				schmarn_context.stepper_state = (value == 1) ? scsENA : scsDIS;
+			}
+
+			if( result ) schmarn_context.stepper_state = scsFLT;
+
+			return result;
 
 	}
-	else
-	{
-		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, value);
-		schmarn_context.stepper_state = (value == 1) ? scsENA : scsDIS;
-	}
-	return result;
+	printf(" invalid state \r\n ");
+
+	return -1;
+
 }
 
 

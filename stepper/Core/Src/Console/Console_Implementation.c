@@ -150,17 +150,16 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 	else if ( strcmp(argv[0], "position") == 0 )
 	{
 		int position = -1;
-		int result = L6474_GetAbsolutePosition(schmarn_context.hL6474, &position);
+		printFuncUnsuccess( L6474_GetAbsolutePosition(schmarn_context.hL6474, &position ));
 		printf("%d\r\n", position);
-		PRINT_RESULT(result);
 
 	}
 // stepper cancel
 //-------------------------------------------------------------------------
 	else if ( strcmp(argv[0], "cancel") == 0 )
 	{
-		int result = StepTimerCancelAsync(NULL);
-		PRINT_RESULT(result);
+		printFuncUnsuccess(StepTimerCancelAsync(NULL));
+
 	}
 // stepper status
 //-------------------------------------------------------------------------
@@ -192,61 +191,63 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 
 				if ( strcmp(argv[1], "torque") == 0 )
 				{
-					result = L6474_GetProperty(h, L6474_PROP_TORQUE, &value_to_read);
+					printFuncUnsuccess(L6474_GetProperty(h, L6474_PROP_TORQUE, &value_to_read));
 					printf("%d\r\n", value_to_read);
-					PRINT_RESULT(result);
+
 				}
 				if ( strcmp(argv[1], "throvercurr") == 0 )
 				{
-					result = L6474_GetProperty(h, L6474_PROP_OCDTH, &value_to_read);
+					printFuncUnsuccess(L6474_GetProperty(h, L6474_PROP_OCDTH, &value_to_read));
 					printf("%d\r\n", value_to_read);
-					PRINT_RESULT(result);
 
 				}
 				if ( strcmp(argv[1], "stepmode") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%d\r\n", schmarn_context.stepper_resolution);
 				}
 				if ( strcmp(argv[1], "stepsperturn") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%d\r\n", schmarn_context.stepper_stepsPturn);
 				}
 				if ( strcmp(argv[1], "timeoff") == 0 )
 				{
-					result = L6474_GetProperty(h, L6474_PROP_TOFF, &value_to_read);
+					printFuncUnsuccess(L6474_GetProperty(h, L6474_PROP_TOFF, &value_to_read));
 					printf("%d\r\n", value_to_read);
-					PRINT_RESULT(result);
 
 				}
 				if ( strcmp(argv[1], "timeon") == 0 )
 				{
-					result = L6474_GetProperty(h, L6474_PROP_TON, &value_to_read);
+					printFuncUnsuccess(L6474_GetProperty(h, L6474_PROP_TON, &value_to_read));
 					printf("%d\r\n", value_to_read);
-					PRINT_RESULT(result);
 				}
 				if ( strcmp(argv[1], "timefast") == 0 )
 				{
-					result = L6474_GetProperty(h, L6474_PROP_TFAST, &value_to_read);
+					printFuncUnsuccess(L6474_GetProperty(h, L6474_PROP_TFAST, &value_to_read));
 					printf("%d\r\n", value_to_read);
-					PRINT_RESULT(result);
 				}
 				if ( strcmp(argv[1], "mmperturn") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%f\r\n", schmarn_context.stepper_mmPturn);
 				}
 				if ( strcmp(argv[1], "posmax") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%f\r\n", (float)(schmarn_context.stepper_maxSteps * schmarn_context.stepper_mmPturn)
 									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 
 				}
 				if ( strcmp(argv[1], "posmin") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%f\r\n", (float)(schmarn_context.stepper_minSteps * schmarn_context.stepper_mmPturn)
 									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 				}
 				if ( strcmp(argv[1], "posref") == 0 )
 				{
+					printf("OK\r\n");
 					printf("%f\r\n", (float)(schmarn_context.stepper_refSteps * schmarn_context.stepper_mmPturn)
 									/ (float)(schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution));
 				}
@@ -262,13 +263,11 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 					// not blocked by active states commands
 					if ( strcmp(argv[1], "torque") == 0 )
 					{
-						result = L6474_SetProperty(h, L6474_PROP_TORQUE, integerValue);
-						PRINT_RESULT(result);
+						printFuncUnsuccess(L6474_SetProperty(h, L6474_PROP_TORQUE, integerValue));
 					}
 					if ( strcmp(argv[1], "throvercurr") == 0 )
 					{
-						result = L6474_SetProperty(h, L6474_PROP_OCDTH, integerValue);
-						PRINT_RESULT(result);
+						printFuncUnsuccess(L6474_SetProperty(h, L6474_PROP_OCDTH, integerValue));
 					}
 					if ( strcmp(argv[1], "stepmode") == 0 )
 					{
@@ -295,12 +294,12 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 							return -1;
 						}
 						schmarn_context.stepper_resolution = integerValue;
-						result = L6474_SetStepMode(schmarn_context.hL6474, sm);
-						PRINT_RESULT(result);
+						printFuncUnsuccess(L6474_SetStepMode(schmarn_context.hL6474, sm));
 
 					}
 					if ( strcmp(argv[1], "stepsperturn") == 0 )
 					{
+						printf("OK\r\n");
 						schmarn_context.stepper_stepsPturn = integerValue;
 					}
 					if(schmarn_context.stepper_state < scsENA)
@@ -308,18 +307,15 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 						//BLOCKED BY ACTIVE STATE CONFIG COMMANDS
 						if ( strcmp(argv[1], "timeoff") == 0 )
 						{
-							result = L6474_SetProperty(h, L6474_PROP_TOFF, integerValue);
-							PRINT_RESULT(result);
+							printFuncUnsuccess(L6474_SetProperty(h, L6474_PROP_TOFF, integerValue));
 						}
 						if ( strcmp(argv[1], "timeon") == 0 )
 						{
-							result = L6474_SetProperty(h, L6474_PROP_TON, integerValue);
-							PRINT_RESULT(result);
+							printFuncUnsuccess(L6474_SetProperty(h, L6474_PROP_TON, integerValue));
 						}
 						if ( strcmp(argv[1], "timefast") == 0 )
 						{
-							result = L6474_SetProperty(h, L6474_PROP_TFAST, integerValue);
-							PRINT_RESULT(result);
+							printFuncUnsuccess(L6474_SetProperty(h, L6474_PROP_TFAST, integerValue));
 						}
 					}
 
@@ -330,20 +326,24 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 				// requires floating points in command line commands
 					if ( strcmp(argv[1], "mmperturn") == 0 )
 					{
+						printf("OK\r\n");
 						schmarn_context.stepper_mmPturn = doubleValue;
 					}
 					if ( strcmp(argv[1], "posmax") == 0 )
 					{
+						printf("OK\r\n");
 						schmarn_context.stepper_maxSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 															/ schmarn_context.stepper_mmPturn;
 					}
 					if ( strcmp(argv[1], "posmin") == 0 )
 					{
+						printf("OK\r\n");
 						schmarn_context.stepper_minSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 																					/ schmarn_context.stepper_mmPturn;
 					}
 					if ( strcmp(argv[1], "posref") == 0 )
 					{
+						printf("OK\r\n");
 						schmarn_context.stepper_refSteps = (doubleValue * schmarn_context.stepper_stepsPturn  * schmarn_context.stepper_resolution)
 																											/ schmarn_context.stepper_mmPturn;
 					}
