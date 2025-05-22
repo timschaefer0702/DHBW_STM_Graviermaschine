@@ -257,7 +257,7 @@ static int StepperCommand_Func( int argc, char** argv, void* ctx)
 			{
 				//Int Config Werte
 				long integerValue;
-				if(strcmp(argv[2], "-v") == 0 && checkZahlenEingabeInt(argv[3],&integerValue))
+				if((strcmp(argv[2], "-v") == 0) && checkZahlenEingabeInt(argv[3],&integerValue) == 0)
 				{
 				// requires integers in command line commands
 					// not blocked by active states commands

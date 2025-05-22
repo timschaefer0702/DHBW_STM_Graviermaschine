@@ -65,9 +65,9 @@ int StepTimer( void* pPWM, int dir, unsigned int numPulses ){
 	for(int i = 0; i < numPulses; i++){
 
 		HAL_GPIO_WritePin(GPIOD, STEP_PULSE_Pin, GPIO_PIN_SET);
-		vTaskDelay(pdMS_TO_TICKS( 10 ));
+		vTaskDelay(pdMS_TO_TICKS( 1 ));
 		HAL_GPIO_WritePin(GPIOD, STEP_PULSE_Pin, GPIO_PIN_RESET);
-		vTaskDelay(pdMS_TO_TICKS( 10 ));
+		vTaskDelay(pdMS_TO_TICKS( 1 ));
 
 	}
 
