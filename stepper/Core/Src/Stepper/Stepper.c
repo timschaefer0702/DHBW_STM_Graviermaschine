@@ -197,6 +197,10 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		TickType_t currentTime = pdTICKS_TO_MS( xTaskGetTickCount() ); // current time in ms
 			 		TickType_t endTime = currentTime + time_to_timeout * 1000;
 
+			 		if( endTime < currentTime ){ // overflow
+
+			 		}
+
 			 		result |= L6474_SetPowerOutputs(hL6474, 1);
 
 			 		if( result != OK ) return result; // das wird ja eh nix
