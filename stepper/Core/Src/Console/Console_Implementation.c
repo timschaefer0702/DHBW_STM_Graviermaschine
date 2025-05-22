@@ -30,8 +30,8 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 	(void)argv;
 	(void)ctx;
 	printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\r\nOK",
-	    0, // has spindle
-		0, // has spindle status
+	    1, // has spindle
+		1, // has spindle status
 		1, // has stepper
 		1, // has stepper move relative
 		0, // has stepper move speed
@@ -52,9 +52,9 @@ static int CapabilityFunc( int argc, char** argv, void* ctx )
 		1, // has stepper config timeon
 		1, // has stepper config timefast
 		1, // has stepper config mmperturn
-		0, // has stepper config posmax
-		0, // has stepper config posmin
-		0, // has stepper config posref
+		1, // has stepper config posmax
+		1, // has stepper config posmin
+		1, // has stepper config posref
 		1, // has stepper config stepsperturn
 		0  // has stepper cancel
 	);

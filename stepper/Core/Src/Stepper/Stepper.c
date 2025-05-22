@@ -1,6 +1,6 @@
 #include "Stepper.h"
 extern SPI_HandleTypeDef hspi1;
-extern L6474_Handle_t hL6474;
+//extern L6474_Handle_t hL6474;
 extern enum Stepper_StatusCode_t stepper_state;
 extern long stepper_abs_pos;
 
@@ -219,7 +219,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
-			 				result |= L6474_StepIncremental(hL6474, -1);
+			 				result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 			 				currentTime = pdTICKS_TO_MS( xTaskGetTickCount() );
 
 			 				if ( currentTime > endTime ) {
@@ -333,7 +333,10 @@ int StepperStatus()
 					|(dS.TH_SD<<5)|(dS.TH_WARN<<6)|(dS.UVLO<<7)|(dS.WRONG_CMD<<8);
 
 	printf("0x%x\r\n0x%x\r\n", schmarn_context.stepper_state, ( unsigned int )driver_status);
-	//TODO is running einfügen
+
+	printf("0\r\n"); //running einfügen
+
+
 	return result;
 }
 
