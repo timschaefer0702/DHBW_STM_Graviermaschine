@@ -4,6 +4,11 @@ extern L6474_Handle_t hL6474;
 extern enum Stepper_StatusCode_t stepper_state;
 extern long stepper_abs_pos;
 
+extern stepper_context schmarn_context;
+
+
+
+
 // ------------------------ functions for L6474x_Platform_t -------------------------------------------------------------------------------------------------
  void* StepLibraryMalloc( unsigned int size ){
 
@@ -47,7 +52,7 @@ void StepDriverReset( void* pGPO, const int ena ){
 }
 
 
-void StepLibraryDelay( int timems ){
+void StepLibraryDelay( unsigned int timems ){
 	vTaskDelay(pdMS_TO_TICKS( timems));
 }
 
@@ -91,17 +96,17 @@ int StepperReset(){
 	result |= L6474_SetBaseParameter(&param);
 
 	// reset and reinitialize, do not setPowerOutput
-	result |= L6474_ResetStandBy(hL6474);
-	result |= L6474_Initialize(hL6474, &param);
+	result |= L6474_ResetStandBy(schmarn_context.hL6474);
+	result |= L6474_Initialize(schmarn_context.hL6474, &param);
 
 	if( result == OK ){
 
-		stepper_state = scsRef;
+		schmarn_context.stepper_state = scsRef;
 
 	}
 
 	else{
-		stepper_state = scsInit;
+		schmarn_context.stepper_state = scsInit;
 	}
 
 	return result;
@@ -118,76 +123,80 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 	int result = OK;
 
-	if( stepper_state == scsRef ){
+	if( schmarn_context.stepper_state == scsRef ){
 
 			switch (param) {
 
 			 	case 0:
 
-			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 1);
 
 			 		if( result != OK ) return result; // das wird ja eh nix
 
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
-			 	    result |= L6474_StepIncremental(hL6474, -1);
+			 	    result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 
 			 		}
 
 			 		if( result == OK ){
 
-			 			stepper_state = scsDIS;
-			 			stepper_abs_pos = 0;
+			 			schmarn_context.stepper_state = scsDIS;
+			 			schmarn_context.stepper_abs_pos = 0;
+			 			result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
+
 
 			 		}
 
 			 		else{
 
-			 			stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsInit;
 
 			 		}
 
 
 
-			 		result |= L6474_SetPowerOutputs(hL6474, 0);
+			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 0);
 
 
 			 		break;
 
 			 	case 1:
 
-			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 1);
 
 			 		if( result != OK ) return result; // das wird ja eh nix
 
 			 		// drive till contact
 			 		while( HAL_GPIO_ReadPin(REFERENCE_MARK_GPIO_Port, REFERENCE_MARK_Pin) == GPIO_PIN_SET && result == OK ){
 
-			 				result |= L6474_StepIncremental(hL6474, -1);
+			 				result |= L6474_StepIncremental(schmarn_context.hL6474, -1);
 
 			 		}
 
 			 		if( result == OK ){
 
-			 			stepper_state = scsENA;
+			 			schmarn_context.stepper_state = scsENA;
 
 			 		}
 
 			 		else{
 
-			 			stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsInit;
 
 			 		}
+			 		result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
 
 			 		break;
 
 			 	case 2:
 
 			 		result = OK;
-			 		stepper_state = scsDIS;
+			 		schmarn_context.stepper_state = scsDIS;
+			 		result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
 			 		// TODO macht sinn? lol? oder tatsächliche position irgendwoher nehmen?
-			 		stepper_abs_pos = 0;
+			 		schmarn_context.stepper_abs_pos = 0;
 
 			 		break;
 
@@ -197,11 +206,13 @@ int StepperReference(int param, uint16_t time_to_timeout){
 			 		TickType_t currentTime = pdTICKS_TO_MS( xTaskGetTickCount() ); // current time in ms
 			 		TickType_t endTime = currentTime + time_to_timeout * 1000;
 
+
 			 		if( endTime < currentTime ){ // overflow
 
 			 		}
 
-			 		result |= L6474_SetPowerOutputs(hL6474, 1);
+			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 1);
+
 
 			 		if( result != OK ) return result; // das wird ja eh nix
 
@@ -213,7 +224,7 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 				if ( currentTime > endTime ) {
 
-			 					L6474_SetPowerOutputs(hL6474, 0);
+			 					L6474_SetPowerOutputs(schmarn_context.hL6474, 0);
 			 					return FAIL;
 
 			 				}
@@ -222,36 +233,88 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 			 		if( result == OK ){
 
-			 			stepper_state = scsDIS;
+			 			schmarn_context.stepper_state = scsDIS;
 
 			 		}
 
 			 		else{
 
-			 			stepper_state = scsInit;
+			 			schmarn_context.stepper_state = scsInit;
 
 			 		}
 
-			 		result |= L6474_SetPowerOutputs(hL6474, 0);
+			 		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, 0);
 
 			 		break;
-
-
-
 			}
-
-
-
-
-
-
-
 	}
 
 	else{
 
 		result = FAIL;
+	}
+	result |= L6474_SetAbsolutePosition(schmarn_context.hL6474,0);
+	return result;
+}
 
+//param:
+//		0 - move abs
+//		1 - move rel
+//		2 - speed
+
+
+int StepperMove(int movement, int param){
+	// TODO LED blinken
+	int result = OK;
+
+	if (schmarn_context.stepper_state != scsENA )
+	{
+		return FAIL;
+	}
+	int jetzige_pos;
+	int ziel;
+	result |= L6474_GetAbsolutePosition(schmarn_context.hL6474, &jetzige_pos);
+
+	switch (param)
+	{
+
+	case 0:
+		 ziel = (movement * schmarn_context.stepper_stepsPturn * schmarn_context.stepper_resolution)
+					/(60 * schmarn_context.stepper_mmPturn);
+
+
+
+			ziel = ziel - jetzige_pos;
+
+			if (ziel > schmarn_context.stepper_maxSteps || ziel < schmarn_context.stepper_minSteps )
+			{
+				printf("no valid step goal");
+				return -1;
+			}
+
+			result |= L6474_StepIncremental(schmarn_context.hL6474, ziel);
+			break;
+
+	case 1:
+		 ziel = (movement * schmarn_context.stepper_stepsPturn * schmarn_context.stepper_resolution)
+					/(60 * schmarn_context.stepper_mmPturn);
+
+		if (ziel + jetzige_pos > schmarn_context.stepper_maxSteps || ziel + jetzige_pos < schmarn_context.stepper_minSteps )
+					{
+						printf("no valid step goal");
+						return -1;
+					}
+		result |= L6474_StepIncremental(schmarn_context.hL6474, ziel);
+
+			break;
+
+	case 2:
+
+			break;
+
+
+	default:
+		return -1;
 	}
 
 
@@ -259,20 +322,36 @@ int StepperReference(int param, uint16_t time_to_timeout){
 
 }
 
-int StepperMove(int abs){
-	// TODO LED blinken
-	int result = OK;
+int StepperStatus()
+{
+	int result = 0;
+	uint32_t driver_status = 0;
+	L6474_Status_t dS;
+	result |= L6474_GetStatus(schmarn_context.hL6474, &dS);
 
-	// TODO check for borders
+	driver_status = (dS.DIR)|(dS.HIGHZ<<1)|(dS.NOTPERF_CMD<<2)|(dS.OCD<<3)|(dS.ONGOING<<4)
+					|(dS.TH_SD<<5)|(dS.TH_WARN<<6)|(dS.UVLO<<7)|(dS.WRONG_CMD<<8);
 
-	if( abs ){
+	printf("0x%x\r\n0x%x\r\n", schmarn_context.stepper_state, ( unsigned int )driver_status);
+	//TODO is running einfügen
+	return result;
+}
 
-		return FAIL;
+int StepperPoweroutputs(int minusV, int value)
+{
+	int result = 0;
+	if (!minusV)
+	{
+		int onoff = (schmarn_context.stepper_state == scsDIS) ? 0 : 1 ;
+		printf("Powerenable: %d\r\n",onoff);
 
 	}
-
+	else
+	{
+		result |= L6474_SetPowerOutputs(schmarn_context.hL6474, value);
+		schmarn_context.stepper_state = (value == 1) ? scsENA : scsDIS;
+	}
 	return result;
-
 }
 
 

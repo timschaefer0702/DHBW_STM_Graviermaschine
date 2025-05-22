@@ -43,7 +43,11 @@
 
 SPI_HandleTypeDef hspi1; // use globallay with extern
 
-TIM_HandleTypeDef htim2;
+
+TIM_HandleTypeDef htim2;	// timer for spindle pwm
+
+TIM_HandleTypeDef htim1;	// timers for stepper pwm
+TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart3;
 
@@ -52,11 +56,10 @@ L6474_Handle_t hL6474;
 
 enum Stepper_StatusCode_t stepper_state = scsInit;
 
-uint16_t stepper_referenced = 0; // 0 -> refernce fahrd isch needed
-uint16_t spindle_direction = 0;  // 0 -> clockwise
-								 // 1 -> counter-clockwise
 
-long stepper_abs_pos = 0;
+
+stepper_context schmarn_context;
+
 
 ConsoleHandle_t cH; //global use with extern in ConsoleImplementation.
 
@@ -196,7 +199,7 @@ int main(void)
   MX_TIM2_Init();
   Console_init();
   //Spindle auf jeden Fall nach Console initen, da Spinlde Handle von Console braucht
-  SpindleInit();
+  SpindleInit(htim2);
   /* USER CODE BEGIN 2 */
   L6474_create();
   printf("Hallo Welt\r\n");
@@ -365,6 +368,10 @@ static void MX_TIM2_Init(void)
 
 }
 
+
+
+
+
 /**
   * @brief USART3 Initialization Function
   * @param None
@@ -521,6 +528,17 @@ static void L6474_create(){
 	p.step = StepTimer;
 	// now create the handle
 	hL6474 = L6474_CreateInstance(&p, 0, 0, &htim2);
+
+	schmarn_context.hL6474 = hL6474;
+	schmarn_context.stepper_state = scsInit;
+	schmarn_context.stepper_abs_pos = 0;
+	schmarn_context.stepper_stepsPturn = STEPS_IN_UMDREHUNG;
+	schmarn_context.stepper_mmPturn = MM_IN_UMDREHUNG;
+	schmarn_context.stepper_resolution = AUFLOESUNG;
+	schmarn_context.stepper_minSteps = 0;
+	schmarn_context.stepper_maxSteps = 100000;
+	schmarn_context.stepper_refSteps = 0;
+
 
 }
 /* USER CODE BEGIN 4 */
